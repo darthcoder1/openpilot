@@ -36,6 +36,7 @@ selfdrive/loggerd/loggerd
 selfdrive/sensord/gpsd
 selfdrive/sensord/sensord
 /src/
+tools/
 
 one
 openpilot
