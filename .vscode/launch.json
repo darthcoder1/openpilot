@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug spinner",
+      "name": "Debug spinner (host)",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceRoot}/selfdrive/ui/spinner/spinner",
@@ -23,6 +23,18 @@
         }
       ],
       "miDebuggerPath": "/usr/bin/lldb-mi"
+    },
+    {
+      "name": "Debug spinner (remote)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceRoot}/selfdrive/ui/spinner/spinner",
+      "args": ["welcome from debugger"],
+      "stopOnEntry": true,
+      "initCommands": [
+        "platform select remote-linux",
+        "platform connect connect://skynet-x1:9999"
+      ]
     }
   ]
 }

@@ -12,9 +12,8 @@
 #include "common/framebuffer.h"
 #include "common/spinner.h"
 
-int main(int argc, char** argv) {
-  int err;
-
+int main(int argc, char **argv)
+{
   spin(argc, argv);
 
   return 0;

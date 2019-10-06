@@ -37,6 +37,8 @@ selfdrive/sensord/gpsd
 selfdrive/sensord/sensord
 /src/
 tools/
+deploy/
+**/build/*
 
 one
 openpilot

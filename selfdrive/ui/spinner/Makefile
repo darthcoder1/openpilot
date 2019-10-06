@@ -1,7 +1,9 @@
 CC = clang
 CXX = clang++
 
-BUILD_TARGET=$(shell uname)
+TARGET=Linux     # Linux, Xavier, Android
+
+HOST_SYSTEM=$(shell uname)
 BUILD_MODE=Debug
 
 PHONELIBS = ../../../phonelibs
@@ -20,11 +22,9 @@ else
     CXXFLAGS = -std=c++11 -fPIC -O2 $(WARN_FLAGS)
 endif
 
-
 NANOVG_FLAGS = -I$(PHONELIBS)/nanovg
 
-
-ifeq ($(BUILD_TARGET), Linux)
+ifeq ($(HOST_SYSTEM), Linux)
     FRAMEBUFFER_LIBS = -lEGL -lX11
     OPENGL_LIBS = -lGLESv2
     OTHER_LIBS =
@@ -49,7 +49,7 @@ all: spinner
 
 spinner: $(OBJS)
 	@echo "[ LINK ] $@"
-	$(CXX) -fPIC -o '$@' $^ \
+	$(CXX) -fPIC -g -o '$@' $^ \
 	      -s \
         $(FRAMEBUFFER_LIBS) \
         -L/system/vendor/lib64 \
