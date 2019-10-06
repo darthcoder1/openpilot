@@ -11,7 +11,7 @@
 // The parameters are input and output and must not be NULL. When calling the function,
 // the parameters are considered as hint for the desired size. When the function returns
 // they hold the actual size of the created window.
-EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height);
+EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height, EGLNativeDisplayType *native_display);
 
 // Changes the power state of the display
 // The accepted mode is one of the values as define in framebuffer.h for
@@ -28,7 +28,7 @@ void platform_display_set_power(int mode);
 
 using namespace android;
 
-EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height)
+EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height, EGLNativeDisplayType *native_display)
 {
     assert(width != NULL);
     assert(height != NULL);
@@ -96,16 +96,20 @@ void platform_display_set_power(int mode)
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
-EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height)
+EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height, EGLNativeDisplayType *native_display)
 {
     assert(width != NULL);
     assert(height != NULL);
+    assert(native_display != NULL);
+    *native_display = NULL;
 
     Display *x_display = XOpenDisplay(NULL);
     if (x_display == NULL)
     {
+        *native_display = NULL;
         return (EGLNativeWindowType)NULL;
     }
+    *native_display = x_display;
 
     // if no desired window size is set, we use the screen size
     bool auto_size = false;
@@ -123,7 +127,23 @@ EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height)
     }
     printf("Screen(%d,%d) %s", *width, *height, auto_size ? "auto" : "fixed");
 
-    Window root = DefaultRootWindow(x_display); // get the root window (usually the whole screen)
+    auto screen = DefaultScreen(x_display);
+
+    Window win = XCreateSimpleWindow(
+        x_display, RootWindow(x_display, screen), 10, 10, *width, *height, 1,
+        BlackPixel(x_display, screen), WhitePixel(x_display, screen));
+
+    Atom windowDeletMessage =
+        XInternAtom(x_display, "WM_DELETE_WINDOW", false);
+    XSetWMProtocols(x_display, win, &windowDeletMessage, 1);
+    XStoreName(x_display, win, "Default Window");
+    XSelectInput(x_display, win, KeyPressMask | KeyReleaseMask | LeaveWindowMask | EnterWindowMask | PointerMotionMask | ResizeRedirectMask);
+    XMapWindow(x_display, win);
+    XFlush(x_display);
+
+    *native_display = x_display;
+
+    /*Window root = DefaultRootWindow(x_display); // get the root window (usually the whole screen)
 
     XSetWindowAttributes swa;
     swa.event_mask = ExposureMask | PointerMotionMask | KeyPressMask;
@@ -182,7 +202,7 @@ EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height)
         False,
         SubstructureNotifyMask,
         &xev);
-
+*/
     return win;
 }
 
@@ -200,6 +220,7 @@ struct FramebufferState
     uint32_t width = 1920;
     uint32_t height = 1080;
 
+    EGLNativeDisplayType native_display;
     EGLNativeWindowType native_window;
     EGLDisplay display;
 
@@ -243,7 +264,11 @@ extern "C" FramebufferState *framebuffer_init(
         EGL_NONE,
     };
 
-    s->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    EGLNativeDisplayType native_display = NULL;
+    s->native_window = platform_create_window(&s->width, &s->height, &native_display);
+    assert(s->native_window != NULL);
+
+    s->display = eglGetDisplay(native_display);
     assert(s->display != EGL_NO_DISPLAY);
 
     success = eglInitialize(s->display, &s->egl_major, &s->egl_minor);
@@ -254,9 +279,6 @@ extern "C" FramebufferState *framebuffer_init(
     EGLint num_configs;
     success = eglChooseConfig(s->display, attribs, &s->config, 1, &num_configs);
     assert(success);
-
-    s->native_window = platform_create_window(&s->width, &s->height);
-    assert(s->native_window != NULL);
 
     s->surface = eglCreateWindowSurface(s->display, s->config, s->native_window, NULL);
     assert(s->surface != EGL_NO_SURFACE);
