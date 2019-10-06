@@ -108,6 +108,7 @@ EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height)
     }
 
     // if no desired window size is set, we use the screen size
+    bool auto_size = false;
     if (*width == 0 || *height == 0)
     {
         int screen_cnt = ScreenCount(x_display);
@@ -117,8 +118,10 @@ EGLNativeWindowType platform_create_window(uint32_t *width, uint32_t *height)
             Screen *screen = ScreenOfDisplay(x_display, 0);
             *width = screen->width;
             *height = screen->height;
+            auto_size = true;
         }
     }
+    printf("Screen(%d,%d) %s", *width, *height, auto_size ? "auto" : "fixed");
 
     Window root = DefaultRootWindow(x_display); // get the root window (usually the whole screen)
 
@@ -253,6 +256,7 @@ extern "C" FramebufferState *framebuffer_init(
     assert(success);
 
     s->native_window = platform_create_window(&s->width, &s->height);
+    assert(s->native_window != NULL);
 
     s->surface = eglCreateWindowSurface(s->display, s->config, s->native_window, NULL);
     assert(s->surface != EGL_NO_SURFACE);
