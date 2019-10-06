@@ -1,6 +1,9 @@
 CC = clang
 CXX = clang++
 
+BUILD_TARGET=$(shell uname)
+BUILD_MODE=Debug
+
 PHONELIBS = ../../../phonelibs
 
 WARN_FLAGS = -Werror=implicit-function-declaration \
@@ -9,22 +12,35 @@ WARN_FLAGS = -Werror=implicit-function-declaration \
              -Werror=return-type \
              -Werror=format-extra-args
 
-CFLAGS = -std=gnu11 -fPIC -O2 $(WARN_FLAGS)
-CXXFLAGS = -std=c++11 -fPIC -O2 $(WARN_FLAGS)
+ifeq ($(BUILD_MODE), Debug)
+    CFLAGS = -g -std=gnu11 -fPIC $(WARN_FLAGS)
+    CXXFLAGS = -g -std=c++11 -fPIC $(WARN_FLAGS)
+else
+    CFLAGS = -std=gnu11 -fPIC -O2 $(WARN_FLAGS)
+    CXXFLAGS = -std=c++11 -fPIC -O2 $(WARN_FLAGS)
+endif
+
 
 NANOVG_FLAGS = -I$(PHONELIBS)/nanovg
 
-OPENGL_LIBS = -lGLESv3
 
-FRAMEBUFFER_LIBS = -lutils -lgui -lEGL
+ifeq ($(BUILD_TARGET), Linux)
+    FRAMEBUFFER_LIBS = -lEGL -lX11
+    OPENGL_LIBS = -lGLESv2
+    OTHER_LIBS =
+else
+    FRAMEBUFFER_LIBS = -lutils -lgui -lEGL
+    OPENGL_LIBS = -lGLESv3
+    OTHER_LIBS =  -llog
+endif
 
 OBJS = spinner.o \
-       ../../common/framebuffer.o \
-       $(PHONELIBS)/nanovg/nanovg.o \
-       ../../common/spinner.o \
-       opensans_semibold.o \
-       img_spinner_track.o \
-       img_spinner_comma.o
+    ../../common/framebuffer.o \
+    $(PHONELIBS)/nanovg/nanovg.o \
+    ../../common/spinner.o \
+    opensans_semibold.o \
+    img_spinner_track.o \
+    img_spinner_comma.o
 
 DEPS := $(OBJS:.o=.d)
 
@@ -38,7 +54,8 @@ spinner: $(OBJS)
         $(FRAMEBUFFER_LIBS) \
         -L/system/vendor/lib64 \
         $(OPENGL_LIBS) \
-        -lm -llog
+        $(OTHER_LIBS) \
+        -lm
 
 ../../common/framebuffer.o: ../../common/framebuffer.cc
 	@echo "[ CXX ] $@"
