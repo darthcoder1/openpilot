@@ -1,7 +1,9 @@
 {
-"python.formatting.provider": "black",
+"python.formatting.provider": "autopep8",
 "files.associations": {
     "framebuffer.h": "c",
-    "iostream": "cpp"
-}
+    "iostream": "cpp",
+    "properties.h": "c"
+},
+"python.pythonPath": "/home/martinz/.local/share/virtualenvs/openpilot-6M-_9Qxd/bin/python"
 }
