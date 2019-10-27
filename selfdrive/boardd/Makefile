@@ -35,8 +35,8 @@ endif
 
 
 ifeq ($(ARCH),x86_64)
-ZMQ_FLAGS = -I$(PHONELIBS)/zmq/aarch64/include
-ZMQ_LIBS = -L$(BASEDIR)/external/zmq/lib/ \
+ZMQ_FLAGS = -I$(PHONELIBS)/zmq/x64/include
+ZMQ_LIBS = -L$(PHONELIBS)/zmq/x64/lib/ \
            -l:libczmq.a -l:libzmq.a
 EXTRA_LIBS = -lusb-1.0 -lpthread
 CXXFLAGS += -I/usr/include/libusb-1.0
@@ -44,7 +44,7 @@ CFLAGS += -I/usr/include/libusb-1.0
 endif
 
 .PHONY: all
-all: boardd
+all: boardd libboard.so
 
 include ../common/cereal.mk
 
@@ -61,6 +61,13 @@ DEPS := $(OBJS:.o=.d)
 boardd: $(OBJS)
 	@echo "[ LINK ] $@"
 	$(CXX) -fPIC -o '$@' $^ \
+            $(CEREAL_LIBS) \
+            $(ZMQ_LIBS) \
+            $(EXTRA_LIBS)
+
+libboard.so: $(OBJS)
+	@echo "[ LINK ] $@"
+	$(CXX) -fPIC -shared -o '$@' $^ \
             $(CEREAL_LIBS) \
             $(ZMQ_LIBS) \
             $(EXTRA_LIBS)
