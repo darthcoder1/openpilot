@@ -10,17 +10,9 @@ if [ -z "$PASSIVE" ]; then
   export PASSIVE="1"
 fi
 
-function launch {
-
-  # no cpu rationing for now
-  echo 0-3 > /dev/cpuset/background/cpus
-  echo 0-3 > /dev/cpuset/system-background/cpus
-  echo 0-3 > /dev/cpuset/foreground/boost/cpus
-  echo 0-3 > /dev/cpuset/foreground/cpus
-  echo 0-3 > /dev/cpuset/android/cpus
+function launch() {
 
   # handle pythonpath
-  ln -s /data/openpilot /data/pythonpath
   export PYTHONPATH="$PWD"
 
   # start manager
