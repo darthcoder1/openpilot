@@ -51,7 +51,7 @@ def parse_service_call(call):
 
 
 def get_subscriber_info():
-    ret = parse_service_call(["service", "call", "iphonesubinfo", "7"])
+    ret = None # parse_service_call(["service", "call", "iphonesubinfo", "7"])
     if ret is None or len(ret) < 8:
         return ""
     if struct.unpack("I", ret[4:8]) == -1:

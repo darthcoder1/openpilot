@@ -1,4 +1,23 @@
 #!/usr/bin/env python2.7
+from selfdrive.loggerd.config import ROOT
+import selfdrive.crash as crash
+from selfdrive.version import version, dirty
+from selfdrive.registration import register
+import selfdrive.messaging as messaging
+from selfdrive.swaglog import cloudlog
+from selfdrive.services import service_list
+import cereal
+from common.params import Params
+from common.file_helpers import atomic_write_in_dir_neos
+from setproctitle import setproctitle  # pylint: disable=no-name-in-module
+from multiprocessing import Process
+import traceback
+import stat
+import re
+import importlib
+import hashlib
+import shutil
+import glob
 import os
 import sys
 import fcntl
@@ -19,10 +38,12 @@ def unblock_stdout():
 
         # child is in its own process group, manually pass kill signals
         signal.signal(
-            signal.SIGINT, lambda signum, frame: os.kill(child_pid, signal.SIGINT)
+            signal.SIGINT, lambda signum, frame: os.kill(
+                child_pid, signal.SIGINT)
         )
         signal.signal(
-            signal.SIGTERM, lambda signum, frame: os.kill(child_pid, signal.SIGTERM)
+            signal.SIGTERM, lambda signum, frame: os.kill(
+                child_pid, signal.SIGTERM)
         )
 
         fcntl.fcntl(
@@ -55,7 +76,8 @@ if __name__ == "__main__":
     neos_update_required = False
 
     if is_neos:
-        version = int(open("/VERSION").read()) if os.path.isfile("/VERSION") else 0
+        version = int(open("/VERSION").read()
+                      ) if os.path.isfile("/VERSION") else 0
         revision = (
             int(open("/REVISION").read()) if version >= 10 else 0
         )  # Revision only present in NEOS 10 and up
@@ -75,8 +97,10 @@ if __name__ == "__main__":
         print("Starting NEOS updater")
         subprocess.check_call(["git", "clean", "-xdf"], cwd=BASEDIR)
         updater_dir = os.path.join(BASEDIR, "installer", "updater")
-        manifest_path = os.path.realpath(os.path.join(updater_dir, "update.json"))
-        os.system(os.path.join(updater_dir, "updater") + " file://" + manifest_path)
+        manifest_path = os.path.realpath(
+            os.path.join(updater_dir, "update.json"))
+        os.system(os.path.join(updater_dir, "updater") +
+                  " file://" + manifest_path)
         raise Exception("NEOS outdated")
     elif os.path.isdir("/data/neoupdate"):
         from shutil import rmtree
@@ -85,32 +109,9 @@ if __name__ == "__main__":
 
     unblock_stdout()
 
-import glob
-import shutil
-import hashlib
-import importlib
-import re
-import stat
-import subprocess
-import traceback
-from multiprocessing import Process
-
-from setproctitle import setproctitle  # pylint: disable=no-name-in-module
-
-from common.file_helpers import atomic_write_in_dir_neos
-from common.params import Params
-import cereal
 
 ThermalStatus = cereal.log.ThermalData.ThermalStatus
 
-from selfdrive.services import service_list
-from selfdrive.swaglog import cloudlog
-import selfdrive.messaging as messaging
-from selfdrive.registration import register
-from selfdrive.version import version, dirty
-import selfdrive.crash as crash
-
-from selfdrive.loggerd.config import ROOT
 
 # comment out anything you don't want to run
 managed_processes = {
@@ -237,7 +238,8 @@ def start_managed_process(name):
         pdir, pargs = proc
         cwd = os.path.join(BASEDIR, pdir)
         cloudlog.info("starting process %s" % name)
-        running[name] = Process(name=name, target=nativelauncher, args=(pargs, cwd))
+        running[name] = Process(
+            name=name, target=nativelauncher, args=(pargs, cwd))
     running[name].start()
 
 
@@ -277,12 +279,15 @@ def prepare_managed_process(p):
         # build this process
         cloudlog.info("building %s" % (proc,))
         try:
-            subprocess.check_call(["make", "-j4"], cwd=os.path.join(BASEDIR, proc[0]))
+            subprocess.check_call(
+                ["make", "-j4"], cwd=os.path.join(BASEDIR, proc[0]))
         except subprocess.CalledProcessError:
             # make clean if the build failed
             cloudlog.warning("building %s failed, make clean" % (proc,))
-            subprocess.check_call(["make", "clean"], cwd=os.path.join(BASEDIR, proc[0]))
-            subprocess.check_call(["make", "-j4"], cwd=os.path.join(BASEDIR, proc[0]))
+            subprocess.check_call(
+                ["make", "clean"], cwd=os.path.join(BASEDIR, proc[0]))
+            subprocess.check_call(
+                ["make", "-j4"], cwd=os.path.join(BASEDIR, proc[0]))
 
 
 def kill_managed_process(name):
@@ -357,7 +362,8 @@ def manager_init(should_register=True):
     if not dirty:
         os.environ["CLEAN"] = "1"
 
-    cloudlog.bind_global(dongle_id=dongle_id, version=version, dirty=dirty, is_eon=True)
+    cloudlog.bind_global(dongle_id=dongle_id,
+                         version=version, dirty=dirty, is_eon=True)
     crash.bind_user(id=dongle_id)
     crash.bind_extra(version=version, dirty=dirty, is_eon=True)
 
@@ -446,7 +452,8 @@ def manager_thread():
 
 
 def get_installed_apks():
-    dat = subprocess.check_output(["pm", "list", "packages", "-f"]).strip().split("\n")
+    dat = subprocess.check_output(
+        ["pm", "list", "packages", "-f"]).strip().split("\n")
     ret = {}
     for x in dat:
         if x.startswith("package:"):
@@ -504,7 +511,8 @@ def update_apks():
 def update_ssh():
     ssh_home_dirpath = "/system/comma/home/.ssh/"
     auth_keys_path = os.path.join(ssh_home_dirpath, "authorized_keys")
-    auth_keys_persist_path = os.path.join(ssh_home_dirpath, "authorized_keys.persist")
+    auth_keys_persist_path = os.path.join(
+        ssh_home_dirpath, "authorized_keys.persist")
     auth_keys_mode = stat.S_IREAD | stat.S_IWRITE
 
     params = Params()
@@ -533,6 +541,9 @@ def update_ssh():
         # nothing to do - let's avoid remount
         return
 
+    # HACK let's not remount for now
+    return
+
     try:
         subprocess.check_call(["mount", "-o", "rw,remount", "/system"])
         if not has_persisted_keys:
@@ -553,16 +564,6 @@ def update_ssh():
 
 def manager_update():
     update_ssh()
-    update_apks()
-
-    uninstall = [
-        app
-        for app in get_installed_apks().keys()
-        if app in ("com.spotify.music", "com.waze")
-    ]
-    for app in uninstall:
-        cloudlog.info("uninstalling %s" % app)
-        os.system("pm uninstall % s" % app)
 
 
 def manager_prepare():
@@ -657,7 +658,8 @@ def main():
     if os.getenv("PREPAREONLY") is not None:
         spinner_proc = None
     else:
-        spinner_text = "chffrplus" if params.get("Passive") == "1" else "openpilot"
+        spinner_text = "chffrplus" if params.get(
+            "Passive") == "1" else "openpilot"
         spinner_proc = subprocess.Popen(
             ["./spinner", "loading %s" % spinner_text],
             cwd=os.path.join(BASEDIR, "selfdrive", "ui", "spinner"),
@@ -665,7 +667,7 @@ def main():
         )
     try:
         manager_update()
-        manager_init()
+        manager_init(False)
         manager_prepare()
     finally:
         if spinner_proc:
@@ -693,4 +695,3 @@ if __name__ == "__main__":
     main()
     # manual exit because we are forked
     sys.exit(0)
-

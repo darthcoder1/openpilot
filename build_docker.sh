@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t openpilot -f Dockerfile.openpilot .
+docker build -t openpilot -f Dockerfile.yaak .

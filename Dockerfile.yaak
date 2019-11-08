@@ -55,5 +55,5 @@ RUN mkdir -p /tmp/openpilot/selfdrive/test/out
 RUN make -C /tmp/openpilot/selfdrive/controls/lib/longitudinal_mpc clean
 RUN make -C /tmp/openpilot/selfdrive/controls/lib/lateral_mpc clean
 
-RUN mkdir -p /home/.ssh && \
-    touch /home/.ssh/authorized_keys
+RUN mkdir -p /system/comma/home/.ssh/ && \
+    touch /system/comma/home/.ssh/authorized_keys
