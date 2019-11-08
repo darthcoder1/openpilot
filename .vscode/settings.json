@@ -3,7 +3,8 @@
 "files.associations": {
     "framebuffer.h": "c",
     "iostream": "cpp",
-    "properties.h": "c"
+    "properties.h": "c",
+    "dense": "cpp"
 },
 "python.pythonPath": "/home/martinz/.local/share/virtualenvs/openpilot-6M-_9Qxd/bin/python"
 }

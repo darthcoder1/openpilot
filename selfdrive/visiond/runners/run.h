@@ -5,11 +5,11 @@
 #include "snpemodel.h"
 
 #ifdef QCOM
-  #define DefaultRunModel SNPEModel
+#define DefaultRunModel SNPEModel
 #else
 #define DefaultRunModel SNPEModel
-  /* #include "tfmodel.h" */
-  /* #define DefaultRunModel TFModel */
+/* #include "tfmodel.h" */
+/* #define DefaultRunModel TFModel */
 #endif
 
 #endif

@@ -15,6 +15,6 @@ $ ./build_docker.sh
 $ ./run_docker_shell.sh
 
 # run openpilot
-# PREPAREONLY=1 to disable the spinner
-root@docker $ PREPAREONLY=1 ./launch_ubuntu.sh
+root@docker $ cd /opt/source
+root@docker $ ./launch_ubuntu.sh
 ```

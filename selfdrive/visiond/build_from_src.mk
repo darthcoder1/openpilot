@@ -22,7 +22,7 @@ endif
 
 JSON_FLAGS = -I$(PHONELIBS)/json/src
 JSON11_FLAGS = -I$(PHONELIBS)/json11/
-EIGEN_FLAGS = -I$(PHONELIBS)/eigen
+EIGEN_FLAGS = -I$(PHONELIBS)/eigen -I/usr/include/eigen3
 
 UNAME_M := $(shell uname -m)
 UNAME_S := $(shell uname -s)
@@ -39,8 +39,7 @@ ifeq ($(UNAME_S),Darwin)
 
   OPENCL_LIBS = -framework OpenCL
 
-  PLATFORM_OBJS = cameras/camera_fake.o \
-                  ../common/visionbuf_cl.o
+  PLATFORM_OBJS = cameras/camera_fake.o
 else
   # assume x86_64 linux
   LIBYUV_FLAGS = -I$(PHONELIBS)/libyuv/include
@@ -64,9 +63,7 @@ else
   CXXFLAGS += -g -I../common
 
   PLATFORM_OBJS = cameras/camera_frame_stream.o \
-                  ../common/visionbuf_cl.o \
-                  ../common/visionimg.o \
-                  runners/tfmodel.o
+                  ../common/visionimg.o
 endif
 
   SSL_FLAGS = -I/usr/include/openssl/

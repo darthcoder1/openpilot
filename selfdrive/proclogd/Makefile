@@ -38,9 +38,13 @@ DEPS := $(OBJS:.o=.d)
 proclogd: $(OBJS)
 	@echo "[ LINK ] $@"
 	$(CXX) -fPIC -o '$@' $^ \
+            -L$(BASEDIR)/phonelibs/zmq/x64/lib \
+            -L/usr/lib/x86_64-linux-gnu/android/ \
+            -lpthread \
             $(CEREAL_LIBS) \
             $(ZMQ_LIBS) \
             -llog
+
 
 %.o: %.cc
 	@echo "[ CXX ] $@"
