@@ -30,7 +30,8 @@
 
 volatile int do_exit = 0;
 
-namespace {
+namespace
+{
 
 pthread_t clock_thread_handle;
 
@@ -39,14 +40,16 @@ void *gps_context;
 void *gps_publisher;
 void *gps_location_publisher;
 
-const GpsInterface* gGpsInterface = NULL;
-const AGpsInterface* gAGpsInterface = NULL;
+const GpsInterface *gGpsInterface = NULL;
+const AGpsInterface *gAGpsInterface = NULL;
 
-void set_do_exit(int sig) {
+void set_do_exit(int sig)
+{
   do_exit = 1;
 }
 
-void nmea_callback(GpsUtcTime timestamp, const char* nmea, int length) {
+void nmea_callback(GpsUtcTime timestamp, const char *nmea, int length)
+{
 
   uint64_t log_time = nanos_since_boot();
   uint64_t log_time_wall = nanos_since_epoch();
@@ -66,7 +69,8 @@ void nmea_callback(GpsUtcTime timestamp, const char* nmea, int length) {
   zmq_send(gps_publisher, bytes.begin(), bytes.size(), 0);
 }
 
-void location_callback(GpsLocation* location) {
+void location_callback(GpsLocation *location)
+{
   //printf("got location callback\n");
   uint64_t log_time = nanos_since_boot();
 
@@ -90,68 +94,69 @@ void location_callback(GpsLocation* location) {
   zmq_send(gps_location_publisher, bytes.begin(), bytes.size(), 0);
 }
 
-pthread_t create_thread_callback(const char* name, void (*start)(void *), void* arg) {
+pthread_t create_thread_callback(const char *name, void (*start)(void *), void *arg)
+{
   LOG("creating thread: %s", name);
   pthread_t thread;
   pthread_attr_t attr;
   int err;
 
   err = pthread_attr_init(&attr);
-  err = pthread_create(&thread, &attr, (void*(*)(void*))start, arg);
+  err = pthread_create(&thread, &attr, (void *(*)(void *))start, arg);
 
   return thread;
 }
 
 GpsCallbacks gps_callbacks = {
-  sizeof(GpsCallbacks),
-  location_callback,
-  NULL,
-  NULL,
-  nmea_callback,
-  NULL,
-  NULL,
-  NULL,
-  create_thread_callback,
+    sizeof(GpsCallbacks),
+    location_callback,
+    NULL,
+    NULL,
+    nmea_callback,
+    NULL,
+    NULL,
+    NULL,
+    create_thread_callback,
 };
 
-void agps_status_cb(AGpsStatus *status) {
-  switch (status->status) {
-    case GPS_REQUEST_AGPS_DATA_CONN:
-      fprintf(stdout, "*** data_conn_open\n");
-      gAGpsInterface->data_conn_open("internet");
-      break;
-    case GPS_RELEASE_AGPS_DATA_CONN:
-      fprintf(stdout, "*** data_conn_closed\n");
-      gAGpsInterface->data_conn_closed();
-      break;
+void agps_status_cb(AGpsStatus *status)
+{
+  switch (status->status)
+  {
+  case GPS_REQUEST_AGPS_DATA_CONN:
+    fprintf(stdout, "*** data_conn_open\n");
+    gAGpsInterface->data_conn_open("internet");
+    break;
+  case GPS_RELEASE_AGPS_DATA_CONN:
+    fprintf(stdout, "*** data_conn_closed\n");
+    gAGpsInterface->data_conn_closed();
+    break;
   }
 }
 
 AGpsCallbacks agps_callbacks = {
-  agps_status_cb,
-  create_thread_callback,
+    agps_status_cb,
+    create_thread_callback,
 };
 
-
-
-void gps_init() {
+void gps_init()
+{
   LOG("*** init GPS");
-  hw_module_t* module = NULL;
-  hw_get_module(GPS_HARDWARE_MODULE_ID, (hw_module_t const**)&module);
+  hw_module_t *module = NULL;
+  hw_get_module(GPS_HARDWARE_MODULE_ID, (hw_module_t const **)&module);
   assert(module);
 
-  static hw_device_t* device = NULL;
+  static hw_device_t *device = NULL;
   module->methods->open(module, GPS_HARDWARE_MODULE_ID, &device);
   assert(device);
 
   // ** get gps interface **
-  gps_device_t* gps_device = (gps_device_t *)device;
+  gps_device_t *gps_device = (gps_device_t *)device;
   gGpsInterface = gps_device->get_gps_interface(gps_device);
   assert(gGpsInterface);
 
-  gAGpsInterface = (const AGpsInterface*)gGpsInterface->get_extension(AGPS_INTERFACE);
+  gAGpsInterface = (const AGpsInterface *)gGpsInterface->get_extension(AGPS_INTERFACE);
   assert(gAGpsInterface);
-
 
   gGpsInterface->init(&gps_callbacks);
   gAGpsInterface->init(&agps_callbacks);
@@ -171,23 +176,28 @@ void gps_init() {
   zmq_bind(gps_location_publisher, "tcp://*:8026");
 }
 
-void gps_destroy() {
+void gps_destroy()
+{
   gGpsInterface->stop();
   gGpsInterface->cleanup();
 }
 
-
-int64_t arm_cntpct() {
-  int64_t v;
-  asm volatile("mrs %0, cntpct_el0" : "=r"(v));
+int64_t arm_cntpct()
+{
+  int64_t v = 0;
+#if AARCH64
+  asm volatile("mrs %0, cntpct_el0"
+               : "=r"(v));
+#endif // AARCH64
   return v;
 }
 
 // TODO: move this out of here
-void* clock_thread(void* args) {
+void *clock_thread(void *args)
+{
   int err = 0;
 
-  void* clock_publisher = zmq_socket(gps_context, ZMQ_PUB);
+  void *clock_publisher = zmq_socket(gps_context, ZMQ_PUB);
   zmq_bind(clock_publisher, "tcp://*:8034");
 
   int timerfd = timerfd_create(CLOCK_BOOTTIME, 0);
@@ -203,10 +213,13 @@ void* clock_thread(void* args) {
   assert(err == 0);
 
   uint64_t expirations = 0;
-  while ((err = read(timerfd, &expirations, sizeof(expirations)))) {
-    if (err < 0) break;
+  while ((err = read(timerfd, &expirations, sizeof(expirations))))
+  {
+    if (err < 0)
+      break;
 
-    if (do_exit) break;
+    if (do_exit)
+      break;
 
     uint64_t boottime = nanos_since_boot();
     uint64_t monotonic = nanos_monotonic();
@@ -219,7 +232,7 @@ void* clock_thread(void* args) {
     cereal::Event::Builder event = msg.initRoot<cereal::Event>();
     event.setLogMonoTime(boottime);
     auto clocks = event.initClocks();
-  
+
     clocks.setBootTimeNanos(boottime);
     clocks.setMonotonicNanos(monotonic);
     clocks.setMonotonicRawNanos(monotonic_raw);
@@ -237,10 +250,10 @@ void* clock_thread(void* args) {
   return NULL;
 }
 
+} // namespace
 
-}
-
-int main() {
+int main()
+{
   int err = 0;
   setpriority(PRIO_PROCESS, 0, -13);
 
@@ -248,14 +261,15 @@ int main() {
   signal(SIGTERM, (sighandler_t)set_do_exit);
 
   gps_init();
-  
+
   rawgps_init();
 
   err = pthread_create(&clock_thread_handle, NULL,
                        clock_thread, NULL);
   assert(err == 0);
 
-  while(!do_exit) pause();
+  while (!do_exit)
+    pause();
 
   err = pthread_join(clock_thread_handle, NULL);
   assert(err == 0);

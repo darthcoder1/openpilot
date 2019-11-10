@@ -16,7 +16,7 @@ WARN_FLAGS = -Werror=implicit-function-declaration \
 CFLAGS = -std=gnu11 -g -fPIC -O2 $(WARN_FLAGS) \
           -I$(PHONELIBS)/android_frameworks_native/include \
           -I$(PHONELIBS)/android_system_core/include \
-          -I$(PHONELIBS)/android_hardware_libhardware/include
+          -I$(PHONELIBS)/android_hardware_libhardware/include \
 CXXFLAGS = -std=c++11 -g -fPIC -O2 $(WARN_FLAGS) \
             -I$(PHONELIBS)/android_frameworks_native/include \
             -I$(PHONELIBS)/android_system_core/include \
@@ -71,6 +71,7 @@ OBJS += loggerd.o \
 ifeq ($(ARCH),x86_64)
 CXXFLAGS += "-DDISABLE_ENCODER"
 ZMQ_LIBS = -L$(BASEDIR)/external/zmq/lib/ \
+           -L$(BASEDIR)/phonelibs/zmq/x64/lib \
            -l:libczmq.a -l:libzmq.a
 EXTRA_LIBS = -lpthread
 OPENMAX_LIBS = ""

@@ -13,13 +13,21 @@ WARN_FLAGS = -Werror=implicit-function-declaration \
 CFLAGS = -std=gnu11 -g -fPIC -O2 $(WARN_FLAGS) \
           -I$(PHONELIBS)/android_frameworks_native/include \
           -I$(PHONELIBS)/android_system_core/include \
-          -I$(PHONELIBS)/android_hardware_libhardware/include
+          -I$(PHONELIBS)/android_hardware_libhardware/include \
+          -I$(PHONELIBS)/zmq/x64/include \
+          -I/usr/include/android
+
 CXXFLAGS = -std=c++11 -g -fPIC -O2 $(WARN_FLAGS) \
             -I$(PHONELIBS)/android_frameworks_native/include \
             -I$(PHONELIBS)/android_system_core/include \
-            -I$(PHONELIBS)/android_hardware_libhardware/include
+            -I$(PHONELIBS)/android_hardware_libhardware/include \
+            -I$(PHONELIBS)/zmq/x64/include \
+            -I/usr/include/android
 
-ZMQ_LIBS = -l:libczmq.a -l:libzmq.a -llog -luuid -lgnustl_shared
+ZMQ_LIBS = -l:libczmq.a -l:libzmq.a -llog -luuid -lgnustl_shared \
+       -L$(BASEDIR)/phonelibs/zmq/x64/lib \
+       -L/usr/lib/x86_64-linux-gnu/android/ \
+       -L/lib/x86_64-linux-gnu/
 
 ifeq ($(ARCH),aarch64)
 CFLAGS += -mcpu=cortex-a57
