@@ -4,7 +4,8 @@
     "framebuffer.h": "c",
     "iostream": "cpp",
     "properties.h": "c",
-    "dense": "cpp"
+    "dense": "cpp",
+    "msm_ion.h": "c"
 },
 "python.pythonPath": "/home/martinz/.local/share/virtualenvs/openpilot-6M-_9Qxd/bin/python"
 }

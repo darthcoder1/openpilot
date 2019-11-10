@@ -3,7 +3,8 @@
 
 #include <linux/ion.h>
 
-enum msm_ion_heap_types {
+enum msm_ion_heap_types
+{
 	ION_HEAP_TYPE_MSM_START = ION_HEAP_TYPE_CUSTOM + 1,
 	ION_HEAP_TYPE_SECURE_DMA = ION_HEAP_TYPE_MSM_START,
 	ION_HEAP_TYPE_SYSTEM_SECURE,
@@ -23,13 +24,14 @@ enum msm_ion_heap_types {
  * possible fallbacks)
  */
 
-enum ion_heap_ids {
+enum ion_heap_ids
+{
 	INVALID_HEAP_ID = -1,
 	ION_CP_MM_HEAP_ID = 8,
 	ION_SECURE_HEAP_ID = 9,
 	ION_SECURE_DISPLAY_HEAP_ID = 10,
 	ION_CP_MFC_HEAP_ID = 12,
-	ION_CP_WB_HEAP_ID = 16, /* 8660 only */
+	ION_CP_WB_HEAP_ID = 16,  /* 8660 only */
 	ION_CAMERA_HEAP_ID = 20, /* 8660 only */
 	ION_SYSTEM_CONTIG_HEAP_ID = 21,
 	ION_ADSP_HEAP_ID = 22,
@@ -52,14 +54,16 @@ enum ion_heap_ids {
 #define ION_IOMMU_HEAP_ID ION_SYSTEM_HEAP_ID
 #define ION_HEAP_TYPE_IOMMU ION_HEAP_TYPE_SYSTEM
 
-enum ion_fixed_position {
+enum ion_fixed_position
+{
 	NOT_FIXED,
 	FIXED_LOW,
 	FIXED_MIDDLE,
 	FIXED_HIGH,
 };
 
-enum cp_mem_usage {
+enum cp_mem_usage
+{
 	VIDEO_BITSTREAM = 0x1,
 	VIDEO_PIXEL = 0x2,
 	VIDEO_NONPIXEL = 0x3,
@@ -75,7 +79,7 @@ enum cp_mem_usage {
  */
 #define ION_FLAG_CP_TOUCH (1 << 17)
 #define ION_FLAG_CP_BITSTREAM (1 << 18)
-#define ION_FLAG_CP_PIXEL  (1 << 19)
+#define ION_FLAG_CP_PIXEL (1 << 19)
 #define ION_FLAG_CP_NON_PIXEL (1 << 20)
 #define ION_FLAG_CP_CAMERA (1 << 21)
 #define ION_FLAG_CP_HLOS (1 << 22)
@@ -107,7 +111,6 @@ enum cp_mem_usage {
  */
 #define ION_FLAG_POOL_FORCE_ALLOC (1 << 16)
 
-
 #define ION_FLAG_POOL_PREFETCH (1 << 27)
 
 /**
@@ -121,28 +124,28 @@ enum cp_mem_usage {
  */
 #define ION_HEAP(bit) (1 << (bit))
 
-#define ION_ADSP_HEAP_NAME	"adsp"
-#define ION_SYSTEM_HEAP_NAME	"system"
-#define ION_VMALLOC_HEAP_NAME	ION_SYSTEM_HEAP_NAME
-#define ION_KMALLOC_HEAP_NAME	"kmalloc"
-#define ION_AUDIO_HEAP_NAME	"audio"
-#define ION_SF_HEAP_NAME	"sf"
-#define ION_MM_HEAP_NAME	"mm"
-#define ION_CAMERA_HEAP_NAME	"camera_preview"
-#define ION_IOMMU_HEAP_NAME	"iommu"
-#define ION_MFC_HEAP_NAME	"mfc"
-#define ION_WB_HEAP_NAME	"wb"
-#define ION_MM_FIRMWARE_HEAP_NAME	"mm_fw"
-#define ION_PIL1_HEAP_NAME  "pil_1"
-#define ION_PIL2_HEAP_NAME  "pil_2"
-#define ION_QSECOM_HEAP_NAME	"qsecom"
-#define ION_SECURE_HEAP_NAME	"secure_heap"
+#define ION_ADSP_HEAP_NAME "adsp"
+#define ION_SYSTEM_HEAP_NAME "system"
+#define ION_VMALLOC_HEAP_NAME ION_SYSTEM_HEAP_NAME
+#define ION_KMALLOC_HEAP_NAME "kmalloc"
+#define ION_AUDIO_HEAP_NAME "audio"
+#define ION_SF_HEAP_NAME "sf"
+#define ION_MM_HEAP_NAME "mm"
+#define ION_CAMERA_HEAP_NAME "camera_preview"
+#define ION_IOMMU_HEAP_NAME "iommu"
+#define ION_MFC_HEAP_NAME "mfc"
+#define ION_WB_HEAP_NAME "wb"
+#define ION_MM_FIRMWARE_HEAP_NAME "mm_fw"
+#define ION_PIL1_HEAP_NAME "pil_1"
+#define ION_PIL2_HEAP_NAME "pil_2"
+#define ION_QSECOM_HEAP_NAME "qsecom"
+#define ION_SECURE_HEAP_NAME "secure_heap"
 #define ION_SECURE_DISPLAY_HEAP_NAME "secure_display"
 
-#define ION_SET_CACHED(__cache)		(__cache | ION_FLAG_CACHED)
-#define ION_SET_UNCACHED(__cache)	(__cache & ~ION_FLAG_CACHED)
+#define ION_SET_CACHED(__cache) (__cache | ION_FLAG_CACHED)
+#define ION_SET_UNCACHED(__cache) (__cache & ~ION_FLAG_CACHED)
 
-#define ION_IS_CACHED(__flags)	((__flags) & ION_FLAG_CACHED)
+#define ION_IS_CACHED(__flags) ((__flags)&ION_FLAG_CACHED)
 
 /* struct ion_flush_data - data passed to ion for flushing caches
  *
@@ -156,7 +159,8 @@ enum cp_mem_usage {
  * of the handle, p + offset through p + offset + length will have
  * the cache operations performed
  */
-struct ion_flush_data {
+struct ion_flush_data
+{
 	ion_user_handle_t handle;
 	int fd;
 	void *vaddr;
@@ -164,13 +168,15 @@ struct ion_flush_data {
 	unsigned int length;
 };
 
-struct ion_prefetch_regions {
+struct ion_prefetch_regions
+{
 	unsigned int vmid;
 	size_t __user *sizes;
 	unsigned int nr_sizes;
 };
 
-struct ion_prefetch_data {
+struct ion_prefetch_data
+{
 	int heap_id;
 	unsigned long len;
 	/* Is unsigned long bad? 32bit compiler vs 64 bit compiler*/
@@ -185,27 +191,27 @@ struct ion_prefetch_data {
  *
  * Clean the caches of the handle specified.
  */
-#define ION_IOC_CLEAN_CACHES	_IOWR(ION_IOC_MSM_MAGIC, 0, \
-						struct ion_flush_data)
+#define ION_IOC_CLEAN_CACHES _IOWR(ION_IOC_MSM_MAGIC, 0, \
+								   struct ion_flush_data)
 /**
  * DOC: ION_IOC_INV_CACHES - invalidate the caches
  *
  * Invalidate the caches of the handle specified.
  */
-#define ION_IOC_INV_CACHES	_IOWR(ION_IOC_MSM_MAGIC, 1, \
-						struct ion_flush_data)
+#define ION_IOC_INV_CACHES _IOWR(ION_IOC_MSM_MAGIC, 1, \
+								 struct ion_flush_data)
 /**
  * DOC: ION_IOC_CLEAN_INV_CACHES - clean and invalidate the caches
  *
  * Clean and invalidate the caches of the handle specified.
  */
-#define ION_IOC_CLEAN_INV_CACHES	_IOWR(ION_IOC_MSM_MAGIC, 2, \
-						struct ion_flush_data)
+#define ION_IOC_CLEAN_INV_CACHES _IOWR(ION_IOC_MSM_MAGIC, 2, \
+									   struct ion_flush_data)
 
-#define ION_IOC_PREFETCH		_IOWR(ION_IOC_MSM_MAGIC, 3, \
-						struct ion_prefetch_data)
+#define ION_IOC_PREFETCH _IOWR(ION_IOC_MSM_MAGIC, 3, \
+							   struct ion_prefetch_data)
 
-#define ION_IOC_DRAIN			_IOWR(ION_IOC_MSM_MAGIC, 4, \
-						struct ion_prefetch_data)
+#define ION_IOC_DRAIN _IOWR(ION_IOC_MSM_MAGIC, 4, \
+							struct ion_prefetch_data)
 
 #endif

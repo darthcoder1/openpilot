@@ -39,7 +39,8 @@ ifeq ($(UNAME_S),Darwin)
 
   OPENCL_LIBS = -framework OpenCL
 
-  PLATFORM_OBJS = cameras/camera_fake.o
+  PLATFORM_OBJS = cameras/camera_fake.o \
+                  ../common/visionbuf_ion.o
 else
   # assume x86_64 linux
   LIBYUV_FLAGS = -I$(PHONELIBS)/libyuv/include
@@ -63,6 +64,7 @@ else
   CXXFLAGS += -g -I../common
 
   PLATFORM_OBJS = cameras/camera_frame_stream.o \
+                  ../common/visionbuf_ion.o \
                   ../common/visionimg.o
 endif
 

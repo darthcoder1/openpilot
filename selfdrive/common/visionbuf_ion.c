@@ -2,15 +2,20 @@
 #include <stdio.h>
 #include <assert.h>
 #include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/ioctl.h>
-
+#include <fcntl.h>
 #include <linux/ion.h>
 #include <CL/cl_ext.h>
 
+#include <string.h>
+
+// this define is needed to avoid errors with msm_ion.h
+#define __user
 #include <msm_ion.h>
 
 #include "visionbuf.h"
-
 
 // just hard-code these for convenience
 // size_t device_page_size = 0;
@@ -26,13 +31,16 @@
 #define PADDING_CL 0
 
 static int ion_fd = -1;
-static void ion_init() {
-  if (ion_fd == -1) {
+static void ion_init()
+{
+  if (ion_fd == -1)
+  {
     ion_fd = open("/dev/ion", O_RDWR | O_NONBLOCK);
   }
 }
 
-VisionBuf visionbuf_allocate(size_t len) {
+VisionBuf visionbuf_allocate(size_t len)
+{
   int err;
 
   ion_init();
@@ -59,20 +67,22 @@ VisionBuf visionbuf_allocate(size_t len) {
   memset(addr, 0, ion_alloc.len);
 
   return (VisionBuf){
-    .len = len,
-    .addr = addr,
-    .handle = ion_alloc.handle,
-    .fd = ion_fd_data.fd,
+      .len = len,
+      .addr = addr,
+      .handle = ion_alloc.handle,
+      .fd = ion_fd_data.fd,
   };
 }
 
-VisionBuf visionbuf_allocate_cl(size_t len, cl_device_id device_id, cl_context ctx, cl_mem *out_mem) {
+VisionBuf visionbuf_allocate_cl(size_t len, cl_device_id device_id, cl_context ctx, cl_mem *out_mem)
+{
   VisionBuf r = visionbuf_allocate(len);
   *out_mem = visionbuf_to_cl(&r, device_id, ctx);
   return r;
 }
 
-cl_mem visionbuf_to_cl(const VisionBuf* buf, cl_device_id device_id, cl_context ctx) {
+cl_mem visionbuf_to_cl(const VisionBuf *buf, cl_device_id device_id, cl_context ctx)
+{
   int err = 0;
 
   assert(((uintptr_t)buf->addr % DEVICE_PAGE_SIZE_CL) == 0);
@@ -91,7 +101,8 @@ cl_mem visionbuf_to_cl(const VisionBuf* buf, cl_device_id device_id, cl_context 
   return mem;
 }
 
-void visionbuf_sync(const VisionBuf* buf, int dir) {
+void visionbuf_sync(const VisionBuf *buf, int dir)
+{
   int err;
 
   struct ion_fd_data fd_data = {0};
@@ -111,7 +122,8 @@ void visionbuf_sync(const VisionBuf* buf, int dir) {
 
   struct ion_custom_data custom_data = {0};
 
-  switch (dir) {
+  switch (dir)
+  {
   case VISIONBUF_SYNC_FROM_DEVICE:
     custom_data.cmd = ION_IOC_INV_CACHES;
     break;
@@ -132,9 +144,10 @@ void visionbuf_sync(const VisionBuf* buf, int dir) {
   assert(err == 0);
 }
 
-void visionbuf_free(const VisionBuf* buf) {
+void visionbuf_free(const VisionBuf *buf)
+{
   struct ion_handle_data handle_data = {
-    .handle = buf->handle,
+      .handle = buf->handle,
   };
   int ret = ioctl(ion_fd, ION_IOC_FREE, &handle_data);
   assert(ret == 0);
