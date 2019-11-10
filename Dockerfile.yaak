@@ -28,8 +28,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     libeigen3-dev
 
-RUN apt-get install -y android-liblog-dev libjpeg-dev
-
+RUN apt-get install -y android-liblog-dev libjpeg-dev zlib1g-dev
 
 COPY phonelibs/install_capnp.sh /tmp/install_capnp.sh
 RUN /tmp/install_capnp.sh
