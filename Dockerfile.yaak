@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y \
     libeigen3-dev
 
 RUN apt-get install -y android-liblog-dev libjpeg-dev zlib1g-dev
+RUN apt-get install -y uuid-dev libusb-1.0-0-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev
 
 COPY phonelibs/install_capnp.sh /tmp/install_capnp.sh
 RUN /tmp/install_capnp.sh
@@ -42,6 +43,7 @@ RUN git clone --branch xavier-support https://github.com/yaak-ai/openpilot-tools
 RUN pip install -r /tmp/openpilot/tools/requirements.txt
 RUN pip install fastcluster scipy dictdiffer azure-batch azure-common azure-nspkg azure-storage-blob azure-storage-common azure-storage-nspkg
 RUN pip install setproctitle pycapnp pyyaml zmq cffi cython raven libusb1
+RUN pip install smbus2
 
 COPY ./.pylintrc /tmp/openpilot/.pylintrc
 COPY ./common /tmp/openpilot/common

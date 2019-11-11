@@ -37,7 +37,8 @@ endif
 ifeq ($(ARCH),x86_64)
 ZMQ_FLAGS = -I$(PHONELIBS)/zmq/x64/include
 ZMQ_LIBS = -L$(PHONELIBS)/zmq/x64/lib/ \
-           -l:libczmq.a -l:libzmq.a
+           -lczmq -lzmq
+CEREAL_LIBS = -lcapnp -lkj -lcapnp_c
 EXTRA_LIBS = -lusb-1.0 -lpthread
 CXXFLAGS += -I/usr/include/libusb-1.0
 CFLAGS += -I/usr/include/libusb-1.0

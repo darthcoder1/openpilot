@@ -31,7 +31,8 @@ EXTRA_LIBS = -lpthread
 
 ifeq ($(ARCH),x86_64)
 ZMQ_FLAGS = -I$(BASEDIR)/phonelibs/zmq/x64/include
-ZMQ_LIBS = -L$(BASEDIR)/external/zmq/lib -L$(BASEDIR)/phonelibs/zmq/x64/lib \
+ZMQ_LIBS = -L$(BASEDIR)/external/zmq/lib \
+           -L$(BASEDIR)/phonelibs/zmq/x64/lib \
            -l:libczmq.a -l:libzmq.a
 ZMQ_SHARED_LIBS = -L$(BASEDIR)/external/zmq/lib \
                   -lczmq -lzmq

@@ -133,8 +133,8 @@ managed_processes = {
     "calibrationd": "selfdrive.locationd.calibrationd",
     "paramsd": ("selfdrive/locationd", ["./paramsd"]),
     "visiond": ("selfdrive/visiond", ["./visiond"]),
-    "sensord": ("selfdrive/sensord", ["./start_sensord.py"]),
-    "gpsd": ("selfdrive/sensord", ["./start_gpsd.py"]),
+    # "sensord": ("selfdrive/sensord", ["./start_sensord.py"]),
+    # "gpsd": ("selfdrive/sensord", ["./start_gpsd.py"]),
     "updated": "selfdrive.updated",
 }
 daemon_processes = {"athenad": "selfdrive.athena.athenad"}
@@ -177,7 +177,7 @@ car_started_processes = [
     "visiond",
     "proclogd",
     "ubloxd",
-    "gpsd",
+    # "gpsd",
     "deleter",
 ]
 

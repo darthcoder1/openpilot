@@ -24,20 +24,27 @@ CXXFLAGS = -std=c++11 -g -fPIC -O2 $(WARN_FLAGS) \
             -I$(PHONELIBS)/zmq/x64/include \
             -I/usr/include/android
 
-ZMQ_LIBS = -l:libczmq.a -l:libzmq.a -llog -luuid -lgnustl_shared \
+ZMQ_LIBS = -l:libczmq.a -l:libzmq.a -llog -luuid \
        -L$(BASEDIR)/phonelibs/zmq/x64/lib \
+       -L$(BASEDIR)/external/zmq/lib \
        -L/usr/lib/x86_64-linux-gnu/android/ \
        -L/lib/x86_64-linux-gnu/
 
 ifeq ($(ARCH),aarch64)
 CFLAGS += -mcpu=cortex-a57
 CXXFLAGS += -mcpu=cortex-a57
+ZMQ_LIBS += -lgnustl_shared
+DIAG_LIBS = -L/system/vendor/lib64 -ltime_genoff -ldiag
+DEFINES = -DTARGET_AARCH64
+else
+DIAG_LIBS =
+DEFINES = -DTARGET_X64
 endif
 
 
 JSON_FLAGS = -I$(PHONELIBS)/json/src
 
-DIAG_LIBS = -L/system/vendor/lib64 -ldiag -ltime_genoff
+
 
 .PHONY: all
 all: sensord gpsd
@@ -60,7 +67,8 @@ sensord: $(SENSORD_OBJS)
 	$(CXX) -fPIC -o '$@' $^ \
             $(CEREAL_LIBS) \
             $(ZMQ_LIBS) \
-            -lhardware
+            -lpthread
+           # -lhardware
 
 gpsd: $(GPSD_OBJS)
 	@echo "[ LINK ] $@"
@@ -68,7 +76,8 @@ gpsd: $(GPSD_OBJS)
             $(CEREAL_LIBS) \
             $(ZMQ_LIBS) \
             $(DIAG_LIBS) \
-            -lhardware
+            -lpthread
+            #-lhardware
 
 %.o: %.cc
 	@echo "[ CXX ] $@"
