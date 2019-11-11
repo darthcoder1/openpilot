@@ -20,10 +20,14 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "C" {
+
+using std::size_t;
+
+extern "C"
+{
 #endif
 
-/*
+    /*
  * If the HAL needs to create service threads to handle graphics related
  * tasks, these threads need to run at HAL_PRIORITY_URGENT_DISPLAY priority
  * if they can block the main rendering thread in any way.
@@ -35,14 +39,15 @@ extern "C" {
  *
  */
 
-#define HAL_PRIORITY_URGENT_DISPLAY     (-8)
+#define HAL_PRIORITY_URGENT_DISPLAY (-8)
 
-/**
+    /**
  * pixel format definitions
  */
 
-enum {
-    /*
+    enum
+    {
+        /*
      * "linear" color pixel formats:
      *
      * When used with ANativeWindow, the dataSpace field describes the color
@@ -52,13 +57,13 @@ enum {
      * gamma-corrected; or whether any special operations are performed when
      * reading or writing into a buffer in one of these formats.
      */
-    HAL_PIXEL_FORMAT_RGBA_8888          = 1,
-    HAL_PIXEL_FORMAT_RGBX_8888          = 2,
-    HAL_PIXEL_FORMAT_RGB_888            = 3,
-    HAL_PIXEL_FORMAT_RGB_565            = 4,
-    HAL_PIXEL_FORMAT_BGRA_8888          = 5,
+        HAL_PIXEL_FORMAT_RGBA_8888 = 1,
+        HAL_PIXEL_FORMAT_RGBX_8888 = 2,
+        HAL_PIXEL_FORMAT_RGB_888 = 3,
+        HAL_PIXEL_FORMAT_RGB_565 = 4,
+        HAL_PIXEL_FORMAT_BGRA_8888 = 5,
 
-    /*
+        /*
      * 0x100 - 0x1FF
      *
      * This range is reserved for pixel formats that are specific to the HAL
@@ -69,7 +74,7 @@ enum {
      * GL_OES_EGL_image_external OpenGL ES extension.
      */
 
-    /*
+        /*
      * Android YUV format:
      *
      * This format is exposed outside of the HAL to software decoders and
@@ -95,10 +100,9 @@ enum {
      * When used with ANativeWindow, the dataSpace field describes the color
      * space of the buffer.
      */
-    HAL_PIXEL_FORMAT_YV12   = 0x32315659, // YCrCb 4:2:0 Planar
+        HAL_PIXEL_FORMAT_YV12 = 0x32315659, // YCrCb 4:2:0 Planar
 
-
-    /*
+        /*
      * Android Y8 format:
      *
      * This format is exposed outside of the HAL to the framework.
@@ -121,9 +125,9 @@ enum {
      * When used with ANativeWindow, the dataSpace field describes the color
      * space of the buffer.
      */
-    HAL_PIXEL_FORMAT_Y8     = 0x20203859,
+        HAL_PIXEL_FORMAT_Y8 = 0x20203859,
 
-    /*
+        /*
      * Android Y16 format:
      *
      * This format is exposed outside of the HAL to the framework.
@@ -150,9 +154,9 @@ enum {
      * image where each sample is a distance value measured by a depth camera,
      * plus an associated confidence value.
      */
-    HAL_PIXEL_FORMAT_Y16    = 0x20363159,
+        HAL_PIXEL_FORMAT_Y16 = 0x20363159,
 
-    /*
+        /*
      * Android RAW sensor format:
      *
      * This format is exposed outside of the camera HAL to applications.
@@ -188,9 +192,9 @@ enum {
      * HAL_DATASPACE_ARBITRARY, as raw image sensor buffers require substantial
      * extra metadata to define.
      */
-    HAL_PIXEL_FORMAT_RAW16 = 0x20,
+        HAL_PIXEL_FORMAT_RAW16 = 0x20,
 
-    /*
+        /*
      * Android RAW10 format:
      *
      * This format is exposed outside of the camera HAL to applications.
@@ -242,9 +246,9 @@ enum {
      * HAL_DATASPACE_ARBITRARY, as raw image sensor buffers require substantial
      * extra metadata to define.
      */
-    HAL_PIXEL_FORMAT_RAW10 = 0x25,
+        HAL_PIXEL_FORMAT_RAW10 = 0x25,
 
-    /*
+        /*
      * Android RAW12 format:
      *
      * This format is exposed outside of camera HAL to applications.
@@ -292,9 +296,9 @@ enum {
      * HAL_DATASPACE_ARBITRARY, as raw image sensor buffers require substantial
      * extra metadata to define.
      */
-    HAL_PIXEL_FORMAT_RAW12 = 0x26,
+        HAL_PIXEL_FORMAT_RAW12 = 0x26,
 
-    /*
+        /*
      * Android opaque RAW format:
      *
      * This format is exposed outside of the camera HAL to applications.
@@ -313,9 +317,9 @@ enum {
      * HAL_DATASPACE_ARBITRARY, as raw image sensor buffers require substantial
      * extra metadata to define.
      */
-    HAL_PIXEL_FORMAT_RAW_OPAQUE = 0x24,
+        HAL_PIXEL_FORMAT_RAW_OPAQUE = 0x24,
 
-    /*
+        /*
      * Android binary blob graphics buffer format:
      *
      * This format is used to carry task-specific data which does not have a
@@ -338,9 +342,9 @@ enum {
      *  Other                         | Unsupported
      *
      */
-    HAL_PIXEL_FORMAT_BLOB = 0x21,
+        HAL_PIXEL_FORMAT_BLOB = 0x21,
 
-    /*
+        /*
      * Android format indicating that the choice of format is entirely up to the
      * device-specific Gralloc implementation.
      *
@@ -356,9 +360,9 @@ enum {
      * When used with ANativeWindow, the dataSpace field describes the color
      * space of the buffer.
      */
-    HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED = 0x22,
+        HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED = 0x22,
 
-    /*
+        /*
      * Android flexible YCbCr 4:2:0 formats
      *
      * This format allows platforms to use an efficient YCbCr/YCrCb 4:2:0
@@ -378,9 +382,9 @@ enum {
      * When used with ANativeWindow, the dataSpace field describes the color
      * space of the buffer.
      */
-    HAL_PIXEL_FORMAT_YCbCr_420_888 = 0x23,
+        HAL_PIXEL_FORMAT_YCbCr_420_888 = 0x23,
 
-    /*
+        /*
      * Android flexible YCbCr 4:2:2 formats
      *
      * This format allows platforms to use an efficient YCbCr/YCrCb 4:2:2
@@ -392,9 +396,9 @@ enum {
      * This format is currently only used by SW readable buffers
      * produced by MediaCodecs, so the gralloc module can ignore this format.
      */
-    HAL_PIXEL_FORMAT_YCbCr_422_888 = 0x27,
+        HAL_PIXEL_FORMAT_YCbCr_422_888 = 0x27,
 
-    /*
+        /*
      * Android flexible YCbCr 4:4:4 formats
      *
      * This format allows platforms to use an efficient YCbCr/YCrCb 4:4:4
@@ -406,9 +410,9 @@ enum {
      * This format is currently only used by SW readable buffers
      * produced by MediaCodecs, so the gralloc module can ignore this format.
      */
-    HAL_PIXEL_FORMAT_YCbCr_444_888 = 0x28,
+        HAL_PIXEL_FORMAT_YCbCr_444_888 = 0x28,
 
-    /*
+        /*
      * Android flexible RGB 888 formats
      *
      * This format allows platforms to use an efficient RGB/BGR/RGBX/BGRX
@@ -420,9 +424,9 @@ enum {
      * This format is currently only used by SW readable buffers
      * produced by MediaCodecs, so the gralloc module can ignore this format.
      */
-    HAL_PIXEL_FORMAT_FLEX_RGB_888 = 0x29,
+        HAL_PIXEL_FORMAT_FLEX_RGB_888 = 0x29,
 
-    /*
+        /*
      * Android flexible RGBA 8888 formats
      *
      * This format allows platforms to use an efficient RGBA/BGRA/ARGB/ABGR
@@ -434,15 +438,15 @@ enum {
      * This format is currently only used by SW readable buffers
      * produced by MediaCodecs, so the gralloc module can ignore this format.
      */
-    HAL_PIXEL_FORMAT_FLEX_RGBA_8888 = 0x2A,
+        HAL_PIXEL_FORMAT_FLEX_RGBA_8888 = 0x2A,
 
-    /* Legacy formats (deprecated), used by ImageFormat.java */
-    HAL_PIXEL_FORMAT_YCbCr_422_SP       = 0x10, // NV16
-    HAL_PIXEL_FORMAT_YCrCb_420_SP       = 0x11, // NV21
-    HAL_PIXEL_FORMAT_YCbCr_422_I        = 0x14, // YUY2
-};
+        /* Legacy formats (deprecated), used by ImageFormat.java */
+        HAL_PIXEL_FORMAT_YCbCr_422_SP = 0x10, // NV16
+        HAL_PIXEL_FORMAT_YCrCb_420_SP = 0x11, // NV21
+        HAL_PIXEL_FORMAT_YCbCr_422_I = 0x14,  // YUY2
+    };
 
-/*
+    /*
  * Structure for describing YCbCr formats for consumption by applications.
  * This is used with HAL_PIXEL_FORMAT_YCbCr_*_888.
  *
@@ -464,19 +468,20 @@ enum {
  * and each chroma value is one byte) and 1 for planar.
  */
 
-struct android_ycbcr {
-    void *y;
-    void *cb;
-    void *cr;
-    size_t ystride;
-    size_t cstride;
-    size_t chroma_step;
+    struct android_ycbcr
+    {
+        void *y;
+        void *cb;
+        void *cr;
+        size_t ystride;
+        size_t cstride;
+        size_t chroma_step;
 
-    /** reserved for future use, set to 0 by gralloc's (*lock_ycbcr)() */
-    uint32_t reserved[8];
-};
+        /** reserved for future use, set to 0 by gralloc's (*lock_ycbcr)() */
+        uint32_t reserved[8];
+    };
 
-/**
+    /**
  * Structure used to define depth point clouds for format HAL_PIXEL_FORMAT_BLOB
  * with dataSpace value of HAL_DATASPACE_DEPTH.
  * When locking a native buffer of the above format and dataSpace value,
@@ -509,16 +514,17 @@ struct android_ycbcr {
  *     lastPoint.confidence = d.xyzc_points[(d.num_points - 1) * 4 + 3];
  */
 
-struct android_depth_points {
-    uint32_t num_points;
+    struct android_depth_points
+    {
+        uint32_t num_points;
 
-    /** reserved for future use, set to 0 by gralloc's (*lock)() */
-    uint32_t reserved[8];
+        /** reserved for future use, set to 0 by gralloc's (*lock)() */
+        uint32_t reserved[8];
 
-    float xyzc_points[];
-};
+        float xyzc_points[];
+    };
 
-/**
+    /**
  * Transformation definitions
  *
  * IMPORTANT NOTE:
@@ -526,22 +532,23 @@ struct android_depth_points {
  *
  */
 
-enum {
-    /* flip source image horizontally (around the vertical axis) */
-    HAL_TRANSFORM_FLIP_H    = 0x01,
-    /* flip source image vertically (around the horizontal axis)*/
-    HAL_TRANSFORM_FLIP_V    = 0x02,
-    /* rotate source image 90 degrees clockwise */
-    HAL_TRANSFORM_ROT_90    = 0x04,
-    /* rotate source image 180 degrees */
-    HAL_TRANSFORM_ROT_180   = 0x03,
-    /* rotate source image 270 degrees clockwise */
-    HAL_TRANSFORM_ROT_270   = 0x07,
-    /* don't use. see system/window.h */
-    HAL_TRANSFORM_RESERVED  = 0x08,
-};
+    enum
+    {
+        /* flip source image horizontally (around the vertical axis) */
+        HAL_TRANSFORM_FLIP_H = 0x01,
+        /* flip source image vertically (around the horizontal axis)*/
+        HAL_TRANSFORM_FLIP_V = 0x02,
+        /* rotate source image 90 degrees clockwise */
+        HAL_TRANSFORM_ROT_90 = 0x04,
+        /* rotate source image 180 degrees */
+        HAL_TRANSFORM_ROT_180 = 0x03,
+        /* rotate source image 270 degrees clockwise */
+        HAL_TRANSFORM_ROT_270 = 0x07,
+        /* don't use. see system/window.h */
+        HAL_TRANSFORM_RESERVED = 0x08,
+    };
 
-/**
+    /**
  * Dataspace Definitions
  * ======================
  *
@@ -554,8 +561,9 @@ enum {
  * Other dataspaces include depth measurement data from a depth camera.
  */
 
-typedef enum android_dataspace {
-    /*
+    typedef enum android_dataspace
+    {
+        /*
      * Default-assumption data space, when not explicitly specified.
      *
      * It is safest to assume the buffer is an image with sRGB primaries and
@@ -564,9 +572,9 @@ typedef enum android_dataspace {
      * expected, except for a possible display gamma transform when drawn to a
      * screen.
      */
-    HAL_DATASPACE_UNKNOWN = 0x0,
+        HAL_DATASPACE_UNKNOWN = 0x0,
 
-    /*
+        /*
      * Arbitrary dataspace with manually defined characteristics.  Definition
      * for colorspaces or other meaning must be communicated separately.
      *
@@ -577,9 +585,9 @@ typedef enum android_dataspace {
      * where a colorspace can have separately defined primaries, transfer
      * characteristics, etc.
      */
-    HAL_DATASPACE_ARBITRARY = 0x1,
+        HAL_DATASPACE_ARBITRARY = 0x1,
 
-    /*
+        /*
      * RGB Colorspaces
      * -----------------
      *
@@ -590,7 +598,7 @@ typedef enum android_dataspace {
      * at the source as a function of linear optical intensity (luminance).
      */
 
-    /*
+        /*
      * sRGB linear encoding:
      *
      * The red, green, and blue components are stored in sRGB space, but
@@ -600,9 +608,9 @@ typedef enum android_dataspace {
      * The values are encoded using the full range ([0,255] for 8-bit) for all
      * components.
      */
-    HAL_DATASPACE_SRGB_LINEAR = 0x200,
+        HAL_DATASPACE_SRGB_LINEAR = 0x200,
 
-    /*
+        /*
      * sRGB gamma encoding:
      *
      * The red, green and blue components are stored in sRGB space, and
@@ -627,9 +635,9 @@ typedef enum android_dataspace {
      * components.
      *
      */
-    HAL_DATASPACE_SRGB = 0x201,
+        HAL_DATASPACE_SRGB = 0x201,
 
-    /*
+        /*
      * YCbCr Colorspaces
      * -----------------
      *
@@ -640,7 +648,7 @@ typedef enum android_dataspace {
      * at the source as a function of linear optical intensity (luminance).
      */
 
-    /*
+        /*
      * JPEG File Interchange Format (JFIF)
      *
      * Same model as BT.601-625, but all values (Y, Cb, Cr) range from 0 to 255
@@ -657,9 +665,9 @@ typedef enum android_dataspace {
      *  red             0.640   0.330
      *  white (D65)     0.3127  0.3290
      */
-    HAL_DATASPACE_JFIF = 0x101,
+        HAL_DATASPACE_JFIF = 0x101,
 
-    /*
+        /*
      * ITU-R Recommendation 601 (BT.601) - 625-line
      *
      * Standard-definition television, 625 Lines (PAL)
@@ -684,9 +692,9 @@ typedef enum android_dataspace {
      *  red             0.640   0.330
      *  white (D65)     0.3127  0.3290
      */
-    HAL_DATASPACE_BT601_625 = 0x102,
+        HAL_DATASPACE_BT601_625 = 0x102,
 
-    /*
+        /*
      * ITU-R Recommendation 601 (BT.601) - 525-line
      *
      * Standard-definition television, 525 Lines (NTSC)
@@ -711,9 +719,9 @@ typedef enum android_dataspace {
      *  red             0.630   0.340
      *  white (D65)     0.3127  0.3290
      */
-    HAL_DATASPACE_BT601_525 = 0x103,
+        HAL_DATASPACE_BT601_525 = 0x103,
 
-    /*
+        /*
      * ITU-R Recommendation 709 (BT.709)
      *
      * High-definition television
@@ -732,9 +740,9 @@ typedef enum android_dataspace {
      *  red             0.640   0.330
      *  white (D65)     0.3127  0.3290
      */
-    HAL_DATASPACE_BT709 = 0x104,
+        HAL_DATASPACE_BT709 = 0x104,
 
-    /*
+        /*
      * The buffer contains depth ranging measurements from a depth camera.
      * This value is valid with formats:
      *    HAL_PIXEL_FORMAT_Y16: 16-bit samples, consisting of a depth measurement
@@ -752,9 +760,9 @@ typedef enum android_dataspace {
      *       The point cloud will be represented with the android_depth_points
      *       structure.
      */
-    HAL_DATASPACE_DEPTH = 0x1000
+        HAL_DATASPACE_DEPTH = 0x1000
 
-} android_dataspace_t;
+    } android_dataspace_t;
 
 #ifdef __cplusplus
 }

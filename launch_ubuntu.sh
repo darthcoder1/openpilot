@@ -17,7 +17,7 @@ function launch() {
 
   # handle pythonpath
   export PYTHONPATH="$PWD"
-
+  export ARCH="$(gcc -Q --help=target |& grep -e -march | awk '{print $2}' | sed s/-/_/g)"
   # start manager
   cd selfdrive
   ./manager.py

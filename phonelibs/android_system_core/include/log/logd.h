@@ -20,7 +20,29 @@
 /* the stable/frozen log-related definitions have been
  * moved to this header, which is exposed by the NDK
  */
+#ifdef ANDROID
 #include <android/log.h>
+#else
+
+enum android_LogPriority
+{
+    ANDROID_LOG_UNKNOWN = 0,
+    ANDROID_LOG_DEFAULT,
+    ANDROID_LOG_VERBOSE,
+    ANDROID_LOG_DEBUG,
+    ANDROID_LOG_INFO,
+    ANDROID_LOG_WARN,
+    ANDROID_LOG_ERROR,
+    ANDROID_LOG_FATAL,
+    ANDROID_LOG_SILENT
+};
+
+#include <stdio.h>
+
+#define __android_log_print(prio, tag, fmt, ...) \
+    (printf(fmt, __VA_ARGS__))
+
+#endif
 
 /* the rest is only used internally by the system */
 #if !defined(_WIN32)
@@ -36,13 +58,14 @@
 #include <log/uio.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-int __android_log_bwrite(int32_t tag, const void *payload, size_t len);
-int __android_log_btwrite(int32_t tag, char type, const void *payload,
-    size_t len);
-int __android_log_bswrite(int32_t tag, const char *payload);
+    int __android_log_bwrite(int32_t tag, const void *payload, size_t len);
+    int __android_log_btwrite(int32_t tag, char type, const void *payload,
+                              size_t len);
+    int __android_log_bswrite(int32_t tag, const char *payload);
 
 #ifdef __cplusplus
 }

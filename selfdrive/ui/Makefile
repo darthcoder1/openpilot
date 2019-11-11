@@ -13,24 +13,37 @@ WARN_FLAGS = -Werror=implicit-function-declaration \
 CFLAGS = -std=gnu11 -fPIC -O2 $(WARN_FLAGS)
 CXXFLAGS = -std=c++11 -fPIC -O2 $(WARN_FLAGS)
 
-ZMQ_LIBS = -l:libczmq.a -l:libzmq.a -lgnustl_shared
+ifeq ($(ARCH),x86_64)
+      ZMQ_LIBS = -lczmq -lzmq -L$(PHONELIBS)zmq/x64/lib/
+	  ZMQ_FLAGS = -I$(PHONELIBS)/zmq/x64/include
+      OPENSL_LIBS =
+      CEREAL_LIBS = -lcapnp
+      FRAMEBUFFER_LIBS =
+      OPENGL_LIBS = -lGLESv2
+      OPENCL_LIBS = -lgsl -lOpenCL
 
-CEREAL_LIBS = -l:libcapn.a
+	  OTHER_LIBS =
+endif
+ifeq ($(ARCH),aarch64)
+      ZMQ_LIBS = -l:libczmq.a -l:libzmq.a -lgnustl_shared
+      OPENSL_LIBS = -lOpenSLES
+      CEREAL_LIBS = -l:libcapn.a
+      FRAMEBUFFER_LIBS = -lutils -lgui -lEGL
+      OPENGL_LIBS = -lGLESv3
+      OPENCL_LIBS = -lgsl -lCB -lOpenCL
+
+	  OTHER_INCLUDE_DIRS =
+	  OTHER_LIBS = -lhardware -lui -lcutils -llog -ladreno_utils
+endif
+
 CEREAL_OBJS = ../../cereal/gen/c/log.capnp.o
 
 NANOVG_FLAGS = -I$(PHONELIBS)/nanovg
 JSON_FLAGS = -I$(PHONELIBS)/json/src
 
 OPENCL_FLAGS = -I$(PHONELIBS)/opencl/include
-OPENCL_LIBS = -lgsl -lCB -lOpenCL
-
-OPENGL_LIBS = -lGLESv3
-
-OPENSL_LIBS = -lOpenSLES
-
 UUID_LIBS = -luuid
 
-FRAMEBUFFER_LIBS = -lutils -lgui -lEGL
 
 CFLAGS += -DQCOM \
           -I$(PHONELIBS)/android_frameworks_native/include \
@@ -66,20 +79,21 @@ DEPS := $(OBJS:.o=.d)
 
 all: ui
 
+
 ui: $(OBJS)
 	@echo "[ LINK ] $@"
 	$(CXX) -fPIC -o '$@' $^ \
-	      $(FRAMEBUFFER_LIBS) \
-	      $(CEREAL_LIBS) \
-	      $(ZMQ_LIBS) \
-        -L/system/vendor/lib64 \
-        -lhardware -lui \
-        $(OPENGL_LIBS) \
-        $(OPENCL_LIBS) \
-        ${OPENSL_LIBS} \
-        ${UUID_LIBS} \
-        -Wl,-rpath=/system/lib64,-rpath=/system/comma/usr/lib \
-        -lcutils -lm -llog -lui -ladreno_utils
+	$(FRAMEBUFFER_LIBS) \
+	$(CEREAL_LIBS) \
+	$(ZMQ_LIBS) \
+	-L/system/vendor/lib64 \
+	$(OTHER_LIBS) \
+	$(OPENGL_LIBS) \
+	$(OPENCL_LIBS) \
+	${OPENSL_LIBS} \
+	${UUID_LIBS} \
+	-Wl,-rpath=/system/lib64,-rpath=/system/comma/usr/lib \
+	-lm
 
 slplay.o: slplay.c
 	@echo "[ CC ] $@"
@@ -91,29 +105,36 @@ slplay.o: slplay.c
 %.o: %.cc
 	@echo "[ CXX ] $@"
 	$(CXX) $(CXXFLAGS) -MMD \
-           -Iinclude -I.. -I../.. \
-           $(OPENCL_FLAGS) \
-           -I$(PHONELIBS)/android_frameworks_native/include \
-           -I$(PHONELIBS)/android_system_core/include \
-           -I$(PHONELIBS)/android_hardware_libhardware/include \
-           -I$(PHONELIBS)/libgralloc/include \
-           -I$(PHONELIBS)/linux/include \
-           -c -o '$@' '$<'
+	-Iinclude -I.. -I../.. \
+	$(OPENCL_FLAGS) \
+	-I$(PHONELIBS)/android_frameworks_native/include \
+	-I$(PHONELIBS)/android_system_core/include \
+	-I$(PHONELIBS)/android_hardware_libhardware/include \
+	-I$(PHONELIBS)/libgralloc/include \
+	-I$(PHONELIBS)/linux/include \
+	-I$(ZMQ_FLAGS) \
+	-c -o '$@' '$<'
 
 %.o: %.c
 	@echo "[ CC ] $@"
 	$(CC) $(CFLAGS) -MMD \
-          -Iinclude -I.. -I../.. \
-          $(NANOVG_FLAGS) \
-          $(ZMQ_FLAGS) \
-          $(CEREAL_CFLAGS) \
-          $(JSON_FLAGS) \
-          $(OPENCL_FLAGS) \
-          -I$(PHONELIBS)/linux/include \
-          -c -o '$@' '$<'
+	-Iinclude -I.. -I../.. \
+	$(NANOVG_FLAGS) \
+	$(ZMQ_FLAGS) \
+	$(CEREAL_CFLAGS) \
+	$(JSON_FLAGS) \
+	$(OPENCL_FLAGS) \
+	-I$(PHONELIBS)/linux/include \
+	-c -o '$@' '$<'
 
 .PHONY: clean
+
 clean:
 	rm -f ui $(OBJS) $(DEPS)
+
+print_vars:
+	echo $(ARCH)
+
+
 
 -include $(DEPS)

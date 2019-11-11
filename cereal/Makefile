@@ -9,7 +9,7 @@ UNAME_M ?= $(shell uname -m)
 
 GENS += gen/c/car.capnp.c gen/c/log.capnp.c gen/c/include/c++.capnp.h gen/c/include/java.capnp.h
 
-ifeq ($(UNAME_M),x86_64)
+ifeq ($(UNAME_M),x86-64)
 
 ifneq (, $(shell which capnpc-java))
 GENS += gen/java/Car.java gen/java/Log.java

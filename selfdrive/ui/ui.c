@@ -10,7 +10,7 @@
 #include <EGL/egl.h>
 
 #include <json.h>
-#include <czmq.h>
+#include "czmq.h"
 
 #include "nanovg.h"
 #define NANOVG_GLES3_IMPLEMENTATION
@@ -2485,6 +2485,8 @@ int is_leon()
   fclose(fp);
   return strstr(str, "letv") != NULL;
 }
+
+typedef void (*sighandler_t)(int);
 
 int main(int argc, char *argv[])
 {
