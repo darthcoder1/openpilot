@@ -7,3 +7,5 @@ wget https://storage.googleapis.com/tensorflow/libtensorflow/$TENSORFLOW_FILENAM
 
 tar -C tensorflow/ -xzf $TENSORFLOW_FILENAME
 rm $TENSORFLOW_FILENAME
+
+# install mesa

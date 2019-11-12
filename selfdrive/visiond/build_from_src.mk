@@ -76,6 +76,9 @@ endif
   CFLAGS += -D_GNU_SOURCE \
             -DCLU_NO_CACHE
   OBJS = visiond.o
+
+  CFLAGS += -DQCOM
+  CXXFLAGS += -DQCOM
 else
 	# assume phone
 

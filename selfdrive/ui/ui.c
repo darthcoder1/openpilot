@@ -10,7 +10,7 @@
 #include <EGL/egl.h>
 
 #include <json.h>
-#include "czmq.h"
+#include <czmq.h>
 
 #include "nanovg.h"
 #define NANOVG_GLES3_IMPLEMENTATION
