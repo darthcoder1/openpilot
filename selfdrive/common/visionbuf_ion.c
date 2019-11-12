@@ -7,12 +7,12 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <linux/ion.h>
+
+#define CL_VERSION_1_1
 #include <CL/cl_ext.h>
 
 #include <string.h>
 
-// this define is needed to avoid errors with msm_ion.h
-#define __user
 #include <msm_ion.h>
 
 #include "visionbuf.h"

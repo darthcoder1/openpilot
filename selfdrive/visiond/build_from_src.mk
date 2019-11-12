@@ -77,8 +77,17 @@ endif
             -DCLU_NO_CACHE
   OBJS = visiond.o
 
-  CFLAGS += -DQCOM
-  CXXFLAGS += -DQCOM
+  CFLAGS += -DQCOM \
+	           -I$(PHONELIBS)/android_system_core/include \
+						 -I$(PHONELIBS)/android_frameworks_native/include \
+						 -I$(PHONELIBS)/android_hardware_libhardware/include \
+	           -I$(PHONELIBS)/linux/include
+
+  CXXFLAGS += -DQCOM \
+	           -I$(PHONELIBS)/android_system_core/include \
+						 -I$(PHONELIBS)/android_frameworks_native/include \
+						 -I$(PHONELIBS)/android_hardware_libhardware/include \
+	           -I$(PHONELIBS)/linux/include
 else
 	# assume phone
 

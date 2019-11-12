@@ -22,7 +22,7 @@ ifeq ($(ARCH),x86_64)
 	OPENGL_LIBS = -lGLESv2 -lX11 -lEGL
 	OPENCL_LIBS = -lOpenCL
 
-	OTHER_LIBS = -lpthread
+	OTHER_LIBS = -lpthread -lhardware
 endif
 ifeq ($(ARCH),aarch64)
 	CFLAGS += -DQCOM
